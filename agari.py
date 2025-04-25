@@ -136,18 +136,61 @@ def get_tile14_and_key(tiles: list[int]) -> tuple[list[int], int]:
     return tile14, key
 
 
-def check_ankan_after_riichi(tehai: list[int], len_div3: int, tile_id: int, strict: bool) -> bool:
+def get_hand_waits(tehai: list[int]):
+    tehai = tehai[:]
+
+    waits = []
+
+    for i in range(34):
+        if tehai[i] >= 4:
+            continue
+
+        tehai[i] += 1
+
+        t14, key = get_tile14_and_key(tehai)
+        if key in AGARI_TABLE:
+            waits.append(i)
+
+        tehai[i] -= 1
+
+    return waits
+
+
+def check_ankan_after_riichi(tehai: list[int], tile_id: int, strict: bool) -> bool:
     if tehai[tile_id] != 4:
         return False
-    elif tile_id >= 27:  # Honor Tile
+    elif tile_id >= 27:  # Honor Tile can always ankan
         return True
+
+    tehai = tehai[:]  # Copying the list
+
+    tehai[tile_id] -= 1
+    waits = get_hand_waits(tehai)
+
+    tehai[tile_id] = 0
+
+    for i in waits:
+        tehai[i] += 1
+        t14, key = get_tile14_and_key(tehai)
+
+        if key not in AGARI_TABLE:
+            return False
+
+        tehai[i] -= 1
+
+    return True
 
 
 AGARI_TABLE: dict[int, list['AgariData']] = load_table_from_gzip()
 
-t14, k = get_tile14_and_key(
-    [0, 0, 2, 2, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-print(t14, k)
-print(AGARI_TABLE[k])
+print(get_hand_waits([1, 1, 0, 0, 0, 0, 2, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0]))
+
+# t14, k = get_tile14_and_key(
+#     [0, 0, 2, 2, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+# print(t14, k)
+# print(AGARI_TABLE[k])
 
 # print(AGARI_TABLE)
