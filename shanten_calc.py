@@ -5,6 +5,7 @@
 # * <https://github.com/tomohxx/shanten-number-calculator/>
 
 import gzip
+import pickle
 
 
 def _read_table(file_loc: str) -> list[list[int]]:
@@ -27,8 +28,13 @@ def _read_table(file_loc: str) -> list[list[int]]:
     return ret
 
 
-_JIHAI_TABLE = _read_table("data/shanten_jihai.bin.gz")  # Length: 78032
-_SUHAI_TABLE = _read_table("data/shanten_suhai.bin.gz")  # Length: 1940777
+# _JIHAI_TABLE = _read_table("data/shanten_jihai.bin.gz")  # Length: 78032
+# _SUHAI_TABLE = _read_table("data/shanten_suhai.bin.gz")  # Length: 1940777
+
+with open("data/jihai_table.pkl", "rb") as f:
+    _JIHAI_TABLE = pickle.load(f)
+with open("data/suhai_table.pkl", "rb") as f:
+    _SUHAI_TABLE = pickle.load(f)
 
 
 def _add_suhai(lhs: list[int], index: int, m: int):
